@@ -19,17 +19,31 @@ class KaryawanController extends BaseController
 
     public function list()
     {
-        $data = $this->karyawan->select('karyawan.*,golongan.namaGolongan,,golongan.bonus')->join('golongan','golongan.id = karyawan.golongan')->where('karyawan.deletedAt is null')->findAll();
+        $data = $this->karyawan->select('karyawan.*,golongan.namaGolongan,golongan.gajiPokok,golongan.bonus')->join('golongan','golongan.id = karyawan.golongan')->where('karyawan.deletedAt is null')->findAll();
         return $this->response->setJSON($data);
     }
 
+    public function listUsers()
+    {
+        $currentKaryawanId = $this->request->getVar('selectedKar');
+        $cekValid = $currentKaryawanId != "";
+        $query = $this->karyawan->select('*')->where('karyawan.deletedAt is null');
+        
+        if ($currentKaryawanId != "") {
+            $query->where('karyawan.userID IS NULL')->orWhere('karyawan.id', $currentKaryawanId);
+        } else {
+            $query->where('karyawan.userID IS NULL');
+        }
+        
+        $data = $query->get()->getResult();
+        return $this->response->setJSON($data);
+    }
     public function save() {
         $isValid = [
             'namaKaryawan' => 'required',
             'alamat' => 'required',
             'tanggalLahir' => 'required',
             'tanggalMasuk' => 'required',
-            'gajiPokok' => 'required',
             'golongan' => 'required',
         ];
        
@@ -42,12 +56,9 @@ class KaryawanController extends BaseController
         $tanggalLahir = str_replace('-', '', $this->request->getVar('tanggalLahir'));
         $randomAngka = str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT);
         $nip = $tanggalLahir . $randomAngka;
-        $gaji = $this->request->getVar('gajiPokok');
-        $gaji = preg_replace('/[^\d.]/', '', $gaji);
         $data = [
             'NIP'=> $nip,
             'namaKaryawan' => $this->request->getVar('namaKaryawan'),
-            'gajiPokok' => $gaji,
             'alamat' => $this->request->getVar('alamat'),
             'tanggalLahir' => $tanggalLahir,
             'tanggalMasuk' => $this->request->getVar('tanggalMasuk'),
@@ -74,7 +85,6 @@ class KaryawanController extends BaseController
             'namaKaryawan' => 'required',
             'alamat' => 'required',
             'tanggalLahir' => 'required',
-            'gajiPokok' => 'required',
             'tanggalMasuk' => 'required',
             'golongan' => 'required',
         ];
@@ -85,11 +95,8 @@ class KaryawanController extends BaseController
             $this->sesi->setFlashdata('validation', $oneline);
             return redirect()->to('dashboard/karyawan/edit/'.$id);
         }
-        $gaji = $this->request->getVar('gajiPokok');
-        $gaji = preg_replace('/[^\d.]/', '', $gaji);
         $data = [
             'namaKaryawan' => $this->request->getVar('namaKaryawan'),
-            'gajiPokok' => $gaji,
             'alamat' => $this->request->getVar('alamat'),
             'tanggalLahir' => $this->request->getVar('tanggalLahir'),
             'tanggalMasuk' => $this->request->getVar('tanggalMasuk'),

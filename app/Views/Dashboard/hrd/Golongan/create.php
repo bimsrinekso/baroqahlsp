@@ -19,6 +19,10 @@
                         <label for="bonus" class="form-label">Bonus (%)</label>
                         <input type="text" class="form-control" placeholder="Bonus" name="bonus" required>
                     </div>
+                    <div class="mb-3">
+                        <label for="gajiPokok" class="form-label">Gaji Pokok</label>
+                        <input type="text" class="form-control" placeholder="Gaji Pokok" id="gajiPokok"name="gajiPokok" required>
+                    </div>
                     <button type="submit" class="btn btn-primary">Simpan</button>
                 </form>
             </div>

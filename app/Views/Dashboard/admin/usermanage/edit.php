@@ -12,18 +12,23 @@
             <div class="card-body">
                 <form action="" method="post">
                     <div class="mb-3">
+                        <label for="pickRole" class="form-label">Role</label>
+                        <select id="pickRole" name="role" class="form-select" required>
+
+                        </select>
+                    </div>
+                    <div class="mb-3" id="karyawan-container" style="display: none;">
+                        <label for="pickKaryawan" class="form-label">Karyawan</label>
+                        <select id="pickKaryawan" name="karyawan" class="form-select">
+                        </select>
+                    </div>
+                    <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
                         <input name="username" value="<?=$result->username?>" type="text" class="form-control" placeholder="Username">
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input name="email" value="<?=$result->email?>"type="email" class="form-control" placeholder="Email">
-                    </div>
-                    <div class="mb-3">
-                        <label for="pickRole" class="form-label">Role</label>
-                        <select id="pickRole" name="role" class="form-select" required>
-
-                        </select>
                     </div>
                     <button type="submit" class="btn btn-primary">Simpan</button>
                 </form>
@@ -67,6 +72,39 @@
             }
         });
     }
+    async function getKaryawan(selectedKar) {
+        $.ajax({
+            url: '<?= base_url('dashboard/karyawan/listUsers') ?>',
+            method: 'POST',
+            dataType: 'json',
+            data: {selectedKar: selectedKar },
+            success: function(response) {
+                console.log("dancok",selectedKar)
+                console.log(response)
+                $('#pickKaryawan').empty();
+                if (response) {
+                    response.forEach(function(kar) {
+                        $('#pickKaryawan').append($('<option>', {
+                            value: kar.id,
+                            text: kar.namaKaryawan
+                        }));
+                    });
+                    if (selectedKar !== null) {
+                        $('#pickKaryawan').val(selectedKar).trigger('change');
+                        
+                    }
+                } else {
+                    $('#pickKaryawan').append($('<option>', {
+                        value: '',
+                        text: 'Tidak ada data'
+                    }));
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr);
+            }
+        });
+    }
     $(document).ready(function() {
         $("#pickRole").select2({
             placeholder: {
@@ -74,9 +112,28 @@
                 text: 'Pilih Golongan'
             },
         });
+        $("#pickKaryawan").select2({
+            placeholder: {
+                id: '',
+                text: 'Pilih Karyawan'
+            },
+        });
         let dataRole = '<?=$result->role_id?>'
         console.log(dataRole)
+        let dataKar = '<?=$result->idKar?>'
+        console.log(dataKar)
         getRole(dataRole);
+
+        $('#pickRole').on('change', function() {
+            var selectedRole = $(this).val();
+            if (selectedRole == 3) {
+                $('#karyawan-container').show();
+                getKaryawan(dataKar);
+            } else {
+                $('#karyawan-container').hide();
+            }
+        });
+        
     })
 </script>
 <?php $this->endSection();?>

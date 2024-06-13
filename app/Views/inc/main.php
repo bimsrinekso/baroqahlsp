@@ -27,6 +27,24 @@
             #content {
                 flex: 1;
             }
+            .select2-selection.select2-selection--single{
+                padding-top:17px;
+                padding-bottom:17px;
+            }
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                position: absolute;
+                top: 4px;
+                left: 5px;
+                right: 5px
+            }
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                padding-left: 30px !important;
+                top: 5px !important;
+                position: absolute !important;
+            }
+            .select2{
+                width: 100% !important
+            }
         </style>
         <?php $this->renderSection('css');?>
 

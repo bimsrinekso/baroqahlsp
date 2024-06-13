@@ -1,26 +1,18 @@
-<?php $this->extend('inc/main');?>
-<?php $this->section('css');?>
+<?php $this->extend('inc/main'); ?>
+<?php $this->section('css'); ?>
 <!-- Include necessary CSS here -->
-<?php $this->endSection();?>
-<?php $this->section('body');?>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
+<?php $this->endSection(); ?>
+
+<?php $this->section('body'); ?>
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Pengelola Gaji</h1>
     </div>
     <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-lg-4 mb-3">
-                <label class="form-label">Start Date</label>
-                <input type="text" id="start-date" name="startDate" class="form-control" placeholder="Start Date">
-            </div>
-            <div class="col-lg-4 mb-3">
-                <label class="form-label">End Date</label>
-                <input type="text" id="end-date" name="endDate" class="form-control" placeholder="End Date">
-            </div>
-            <div class="col-lg-4 mb-3">
-                <label for="pickKaryawan" class="form-label">Karyawan</label>
-                <select id="pickKaryawan" name="karyawanID" class="form-select" required>
-                    <!-- Options will be populated here -->
-                </select>
+                <label class="form-label">Date Range</label>
+                <input type="text" id="date-range" name="dateRange" class="form-control" placeholder="Select Date Range">
             </div>
             <div class="col-lg-12 mb-3">
                 <button id="filter-button" class="btn btn-primary">Filter</button>
@@ -36,48 +28,21 @@
                     <th class="text-center">Bonus</th>
                     <th class="text-center">Potongan</th>
                     <th class="text-center">Total Gaji</th>
-                    <th class="text-center">Action</th>
                 </tr>
             </thead>
             <tbody>
-
+                <!-- Data will be populated here -->
             </tbody>
         </table>
     </div>
-<?php $this->endSection();?>
-<?php $this->section('javascript');?>
-<script>
-    async function getKaryawan() {
-        $.ajax({
-            url: '<?=base_url('dashboard/karyawan/list')?>',
-            method: 'GET',
-            dataType: 'json',
-            success: function (response) {
-                $('#pickKaryawan').empty();
-                if (response) {
-                    $('#pickKaryawan').append($('<option>', {
-                        value: '',
-                        text: 'Pilih Karyawan'
-                    }));
-                    response.forEach(function (kar) {
-                        $('#pickKaryawan').append($('<option>', {
-                            value: kar.id,
-                            text: kar.namaKaryawan
-                        }));
-                    });
-                } else {
-                    $('#pickKaryawan').append($('<option>', {
-                        value: '',
-                        text: 'Tidak ada data'
-                    }));
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error(error);
-            }
-        });
-    }
+<?php $this->endSection(); ?>
 
+<?php $this->section('javascript'); ?>
+<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script>
+    let idKar = '<?=$dataKar->id?>';
+    console.log(idKar);
     function createMonthYearPicker(id) {
         $(id).datepicker({
             changeMonth: true,
@@ -98,34 +63,53 @@
             });
         });
     }
+    function formatCurrency(value) {
+        if (!value) return 'Rp 0.000';
+        value = parseFloat(value).toFixed(3); // Ensure value has three decimal places
+        return 'Rp ' + value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
 
     $(document).ready(function() {
-        $("#pickKaryawan").select2({
-            placeholder: {
-                id: '',
-                text: 'Pilih Karyawan'
-            },
+        createMonthYearPicker('#month-date');
+        
+        // Initialize date range picker without setting initial value
+        $('#date-range').daterangepicker({
+            autoUpdateInput: false, // Disable automatic input update
+            locale: {
+                cancelLabel: 'Clear',
+                format: 'YYYY-MM'
+            }
         });
-        getKaryawan();
-        createMonthYearPicker('#start-date');
-        createMonthYearPicker('#end-date');
+
+        // Event listener for applying the date range
+        $('#date-range').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('YYYY-MM') + ' - ' + picker.endDate.format('YYYY-MM'));
+        });
+
+        // Event listener for clearing the date range
+        $('#date-range').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+        });
 
         var tablelist = $('#table-gaji').DataTable({
+            scrollX: true,
             ajax: {
                 url: '<?= base_url('dashboard/gaji/list'); ?>',
                 method: "POST",
-                data: function (d) {
+                data: function(d) {
                     console.log(d)
-                    d.startDate = $('#start-date').val();
-                    d.endDate = $('#end-date').val();
-                    d.karyawanID = $('#pickKaryawan').val();
+                    var dateRange = $('#date-range').val().split(' - ');
+                    d.startDate = dateRange[0];
+                    d.endDate = dateRange[1];
+                    d.karyawanID = idKar;
                 },
                 dataSrc: 'data',
                 // success: function (response) {
                 //     console.log(response)
                 // },
-                error: function (xhr, status, error) {
-                    console.log(xhr);
+                error: function(xhr, status, error) {
+                    console.log(error);
                     alert('Gagal memuat data gaji. Silakan coba lagi nanti.');
                 }
             },
@@ -148,27 +132,27 @@
                         if(data == null) {
                             return '-';
                         } else {
-                            return data;
+                            return formatCurrency(data);
                         }
                     }
                 },
-                { data: 'bonus', 
+                { data: 'totalBonus', 
                     className: 'text-center',
                     render: function(data, type, row) {
                         if(data == null) {
                             return '-';
                         } else {
-                            return data;
+                            return formatCurrency(data);
                         }
                     }
                 },
-                { data: 'potongan', 
+                { data: 'totalPotongan', 
                     className: 'text-center',
                     render: function(data, type, row) {
                         if(data == null) {
                             return '-';
                         } else {
-                            return data;
+                            return formatCurrency(data);
                         }
                     }
                 },
@@ -178,39 +162,17 @@
                         if(data == null) {
                             return '-';
                         } else {
-                            return data;
+                            return formatCurrency(data);
                         }
                     }
                 },
-                {
-                    data: 'gaji.id',
-                    className: 'text-center',
-                    render: function(data, type, row) {
-                        return data;
-                    }
-                }
             ],
             dom: 'Bfrtip',
             buttons: [
-                {
-                    extend: 'excelHtml5',
-                    exportOptions: {
-                        columns: ':not(:last-child)'
-                    }
-                },
-                {
-                    extend: 'pdfHtml5',
-                    exportOptions: {
-                        columns: ':not(:last-child)'
-                    }
-                },
-                {
-                    extend: 'print',
-                    exportOptions: {
-                        columns: ':not(:last-child)'
-                    }
-                }
-            ]
+                { extend: 'excelHtml5' },
+                { extend: 'pdfHtml5' },
+                { extend: 'print' }
+            ],
         });
 
         $('#filter-button').click(function() {
@@ -218,4 +180,4 @@
         });
     });
 </script>
-<?php $this->endSection();?>
+<?php $this->endSection(); ?>

@@ -10,7 +10,7 @@ $routes->get('/login', 'AuthLogin::index');
 $routes->post('/login', 'AuthLogin::cekLogin');
 $routes->get('/logout', 'AuthLogin::isLogout');
 $routes->group('dashboard', static function ($routes){
-    $routes->get('', 'Dashboard::index',['filter' => 'role:admin,HRD']);
+    $routes->get('', 'Dashboard::index',['filter' => 'role:admin,HRD,karyawan']);
     $routes->group('golongan', static function ($routes){
         $routes->get('', 'GolonganController::index',['filter' => 'role:admin,HRD']);
         $routes->get('list', 'GolonganController::list',['filter' => 'role:admin,HRD']);
@@ -23,6 +23,7 @@ $routes->group('dashboard', static function ($routes){
     $routes->group('karyawan', static function ($routes){
         $routes->get('', 'KaryawanController::index',['filter' => 'role:admin,HRD']);
         $routes->get('list', 'KaryawanController::list',['filter' => 'role:admin,HRD']);
+        $routes->post('listUsers', 'KaryawanController::listUsers',['filter' => 'role:admin']);
         $routes->get('create', 'KaryawanController::create',['filter' => 'role:admin,HRD']);
         $routes->post('create', 'KaryawanController::save',['filter' => 'role:admin,HRD']);
         $routes->get('edit/(:any)', 'KaryawanController::edit/$1',['filter' => 'role:admin,HRD']);
@@ -31,10 +32,10 @@ $routes->group('dashboard', static function ($routes){
     });
 
     $routes->group('gaji', static function ($routes){
-        $routes->get('', 'GajiController::index',['filter' => 'role:admin,HRD']);
-        $routes->post('list', 'GajiController::list',['filter' => 'role:admin,HRD']);
+        $routes->get('', 'GajiController::index',['filter' => 'role:admin,HRD,karyawan']);
+        $routes->post('list', 'GajiController::list',['filter' => 'role:admin,HRD,karyawan']);
         // $routes->get('create', 'GajiController::create');
-        // $routes->post('create', 'GajiController::save');
+        $routes->post('create', 'GajiController::save');
         // $routes->get('edit/(:any)', 'GajiController::edit/$1');
         // $routes->post('edit/(:any)', 'GajiController::update/$1');
         // $routes->delete('delete/(:any)', 'GajiController::delete/$1');

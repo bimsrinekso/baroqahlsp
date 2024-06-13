@@ -16,7 +16,6 @@
                     <th class="text-center">Nama Karyawan</th>
                     <th class="text-center">NIP</th>
                     <th class="text-center">Tanggal Masuk</th>
-                    <th class="text-center">Gaji Pokok</th>
                     <th class="text-center">Golongan</th>
                     <th class="text-center">Action</th>
                 </tr>
@@ -57,7 +56,6 @@
                 { data: 'namaKaryawan', className: 'text-center' },
                 { data: 'NIP', className: 'text-center' },
                 { data: 'tanggalMasuk' , className: 'text-center'},
-                { data: 'gajiPokok', className: 'text-center' },
                 { data: 'namaGolongan' , className: 'text-center'},
                 {
                     data: 'id',

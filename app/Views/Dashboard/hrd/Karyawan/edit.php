@@ -33,10 +33,6 @@
 
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label for="gajiPokok" class="form-label">Gaji Pokok</label>
-                        <input type="text" class="form-control" placeholder="Gaji Pokok" value="<?=$result->gajiPokok?>" name="gajiPokok" required>
-                    </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>

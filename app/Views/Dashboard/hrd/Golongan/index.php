@@ -15,6 +15,7 @@
                 <tr>
                     <th class="text-center">Nama Golongan</th>
                     <th class="text-center">Bonus</th>
+                    <th class="text-center">Gaji Pokok</th>
                     <th class="text-center">Action</th>
                 </tr>
             </thead>
@@ -55,6 +56,7 @@
             columns: [
                 { data: 'namaGolongan', className: 'text-center' },
                 { data: 'bonus' , className: 'text-center'},
+                { data: 'gajiPokok' , className: 'text-center'},
                 {
                     data: 'id',
                     className: 'text-center',

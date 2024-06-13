@@ -21,12 +21,24 @@ class UserManageController extends BaseController
 
     public function save()
     {
-        $isValid = [
-            'username' => 'required',
-            'email' => 'required',
-            'password' => 'required|min_length[6]',
-            'role' => 'required',
-        ];
+        $role = $this->request->getVar('role');
+        $isValid;
+        if ($role == 3) {
+            $isValid = [
+                'username' => 'required',
+                'email' => 'required',
+                'password' => 'required|min_length[6]',
+                'role' => 'required',
+                'karyawan' => 'required',
+            ];
+        } else {
+            $isValid = [
+                'username' => 'required',
+                'email' => 'required',
+                'password' => 'required|min_length[6]',
+                'role' => 'required',
+            ];
+        }
        
         if (!$this->validate($isValid)) {
             $html = $this->valid->listErrors();
@@ -44,6 +56,12 @@ class UserManageController extends BaseController
             'avatar' => 'default.png'
         ];
         try {
+            if ($role == 3) {
+                $dataKaryawan = [
+                    'userID' => $dataUsers['id']
+                ];
+                $this->karyawan->update($this->request->getVar('karyawan'),$dataKaryawan);
+            }
             $this->users->insert($dataUsers);
             $this->sesi->setFlashdata('sukses', 'Sukses menambah data user');
             return redirect()->to('dashboard/usermanage');
@@ -54,17 +72,29 @@ class UserManageController extends BaseController
     
     public function edit($id = null) {
         $data = [
-            'result' => $this->users->where('deletedAt is null')->where('id',$id)->first(),
+            'result' => $this->users->select('users.*,karyawan.userID,karyawan.id as idKar')->join('karyawan','karyawan.userID = users.id','left')->where('users.deletedAt is null')->where('karyawan.deletedAt is null')->where('users.id',$id)->first(),
         ];
         return view('Dashboard/admin/usermanage/edit',$data);
     }
 
     public function update($id = null) {
-        $isValid = [
-            'username' => 'required',
-            'email' => 'required',
-            'role' => 'required',
-        ];
+        $role = $this->request->getVar('role');
+        $isValid;
+        if ($role == 3) {
+            $isValid = [
+                'username' => 'required',
+                'email' => 'required',
+                'role' => 'required',
+                'karyawan' => 'required'
+            ];
+        } else {
+            $isValid = [
+                'username' => 'required',
+                'email' => 'required',
+                'role' => 'required',
+            ];
+        }
+
        
         if (!$this->validate($isValid)) {
             $html = $this->valid->listErrors();
@@ -78,6 +108,28 @@ class UserManageController extends BaseController
             'role_id' => $this->request->getVar('role'),
         ];
         try {
+            $previousRole = $this->users->where('id',$id)->first();
+            $previousKaryawan = $this->karyawan->where('userID', $id)->first();
+    
+            // If role is 3 and karyawan is different from the previous one
+            if ($role == 3) {
+                $newKaryawanId = $this->request->getVar('karyawan');
+    
+                if ($previousKaryawan && $previousKaryawan->id != $newKaryawanId) {
+                    // Set the previous karyawan userID to null
+                    $this->karyawan->update($previousKaryawan->id, ['userID' => null]);
+                }
+    
+                // Update the new karyawan userID
+                $this->karyawan->update($newKaryawanId, ['userID' => $id]);
+            } 
+    
+            // If role changes from 3 to 1 or 2, set the previous karyawan userID to null
+            if ($previousRole->role_id == 3 && $role != 3) {
+                if ($previousKaryawan) {
+                    $this->karyawan->update($previousKaryawan->id, ['userID' => null]);
+                }
+            }
             $this->users->update($id,$data);
             $this->sesi->setFlashdata('sukses', 'Sukses mengubah data user');
             return redirect()->to('dashboard/usermanage');
@@ -88,6 +140,10 @@ class UserManageController extends BaseController
 
     public function delete($id)
     {
+        $dataKaryawan = $this->karyawan->where('userID', $id)->first();
+        if (!empty($dataKaryawan)) {
+            $this->karyawan->update($dataKaryawan->id, ['userID' => null]);
+        }
         $this->users->delete($id);
         $this->sesi->setFlashdata('sukses', 'Data berhasil dihapus');
         return redirect()->to('dashboard/usermanage'); 

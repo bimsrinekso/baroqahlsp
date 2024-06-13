@@ -14,6 +14,7 @@ class GolonganModel extends Model
     [
         'namaGolongan',
         'bonus',
+        'gajiPokok',
     ];
 
     protected $useTimestamps = true;

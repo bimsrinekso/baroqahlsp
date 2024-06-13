@@ -68,7 +68,7 @@
                     </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-danger">Simpan</button>
+                    <button type="button" class="btn btn-danger" id="save-salary-btn">Simpan</button>
                 </div>
             </div>
         </div>
@@ -118,7 +118,6 @@
             success: function(response) {
                 $('#pickKaryawanDD').empty();
                 if (response) {
-                    console.log(response)
                     $('#pickKaryawanDD').append($('<option>', {
                         value: '',
                         text: 'Pilih Karyawan'
@@ -164,6 +163,12 @@
             });
         });
     }
+    function formatCurrency(value) {
+        if (!value) return 'Rp 0.000';
+        value = parseFloat(value).toFixed(3); // Ensure value has three decimal places
+        return 'Rp ' + value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
 
     $(document).ready(function() {
         $("#pickKaryawan").select2({
@@ -196,6 +201,7 @@
         });
 
         var tablelist = $('#table-gaji').DataTable({
+            scrollX: true,
             ajax: {
                 url: '<?= base_url('dashboard/gaji/list'); ?>',
                 method: "POST",
@@ -207,6 +213,9 @@
                     d.karyawanID = $('#pickKaryawan').val();
                 },
                 dataSrc: 'data',
+                // success: function (response) {
+                //     console.log(response)
+                // },
                 error: function(xhr, status, error) {
                     console.log(error);
                     alert('Gagal memuat data gaji. Silakan coba lagi nanti.');
@@ -231,7 +240,7 @@
                         if(data == null) {
                             return '-';
                         } else {
-                            return data;
+                            return formatCurrency(data);
                         }
                     }
                 },
@@ -241,7 +250,7 @@
                         if(data == null) {
                             return '-';
                         } else {
-                            return data;
+                            return formatCurrency(data);
                         }
                     }
                 },
@@ -251,7 +260,7 @@
                         if(data == null) {
                             return '-';
                         } else {
-                            return data;
+                            return formatCurrency(data);
                         }
                     }
                 },
@@ -261,17 +270,17 @@
                         if(data == null) {
                             return '-';
                         } else {
-                            return data;
+                            return formatCurrency(data);
                         }
                     }
                 },
             ],
             dom: 'Bfrtip',
             buttons: [
-                { extend: 'excelHtml5', exportOptions: { columns: ':not(:last-child)' } },
-                { extend: 'pdfHtml5', exportOptions: { columns: ':not(:last-child)' } },
-                { extend: 'print', exportOptions: { columns: ':not(:last-child)' } }
-            ]
+                { extend: 'excelHtml5' },
+                { extend: 'pdfHtml5' },
+                { extend: 'print' }
+            ],
         });
 
         $('#filter-button').click(function() {
@@ -305,6 +314,40 @@
                     <input type="text" id="totalGaji" name="totalGaji" class="form-control" value="${totalGaji}" readonly>
                 </div>
             `);
+        });
+        $('#save-salary-btn').click(function() {
+            var formData = {
+                karyawanIDdd: $('#pickKaryawanDD').val(),
+                month: $('#month-date').val(),
+                gajiPokok: $('#gajiPokok').val(),
+                totalBonus: $('#totalBonus').val(),
+                totalPotongan: $('#totalPotongan').val(),
+                totalGaji: $('#totalGaji').val()
+            };
+            
+            $.ajax({
+                url: '<?= base_url('dashboard/gaji/create') ?>',
+                method: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    console.log(formData)
+                    console.log(response)
+                    if (response.success == 200) {
+                        toastr.success(response.message);
+                        $('#bayarModal').modal('hide');
+                        tablelist.ajax.reload();
+                    } else {
+                        toastr.error(response.message);
+                        $('#bayarModal').modal('hide');
+                        tablelist.ajax.reload();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log(xhr)
+                    alert('Gagal menyimpan data. Silakan coba lagi nanti.');
+                }
+            });
         });
     });
 </script>

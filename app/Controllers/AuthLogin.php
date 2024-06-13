@@ -25,7 +25,6 @@ class AuthLogin extends BaseController
             return redirect()->to('/login')->withInput()->with('validation', '');
         }
         $user = $this->users->where("username", $this->request->getVar("username"))->first();
-        // dd($user);
         if (!$user) {
             $this->sesi->setFlashdata('error', 'Username tidak ditemukan');
             return redirect()->to('/login');

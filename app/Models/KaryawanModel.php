@@ -18,7 +18,7 @@ class KaryawanModel extends Model
         'tanggalLahir',
         'golongan',
         'NIP',
-        'gajiPokok',
+        'userID'
     ];
 
     protected $useTimestamps = true;

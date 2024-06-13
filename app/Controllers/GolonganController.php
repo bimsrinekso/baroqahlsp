@@ -37,7 +37,8 @@ class GolonganController extends BaseController
         }
         $bonus = filter_var($this->request->getVar('bonus'), FILTER_SANITIZE_NUMBER_INT);
         $bonus = $bonus / 100;
-        $gaji= filter_var($this->request->getVar('gajiPokok'), FILTER_SANITIZE_NUMBER_INT);
+        $gaji = $this->request->getVar('gajiPokok');
+        $gaji = preg_replace('/[^\d.]/', '', $gaji);
         $data = [
            'namaGolongan' => $this->request->getVar('namaGolongan'),
            'gajiPokok' => $gaji,

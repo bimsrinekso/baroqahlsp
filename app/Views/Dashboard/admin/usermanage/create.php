@@ -12,18 +12,24 @@
             <div class="card-body">
                 <form action="" method="post">
                     <div class="mb-3">
+                        <label for="pickRole" class="form-label">Role</label>
+                        <select id="pickRole" name="role" class="form-select" required>
+
+                        </select>
+                    </div>
+                    <div class="mb-3" id="karyawan-container" style="display: none;">
+                        <label for="pickKaryawan" class="form-label">Karyawan</label>
+                        <select id="pickKaryawan" name="karyawan" class="form-select">
+
+                        </select>
+                    </div>
+                    <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
                         <input name="username" type="text" class="form-control" placeholder="Username">
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input name="email" type="email" class="form-control" placeholder="Email">
-                    </div>
-                    <div class="mb-3">
-                        <label for="pickRole" class="form-label">Role</label>
-                        <select id="pickRole" name="role" class="form-select" required>
-
-                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="password">Password</label>
@@ -72,14 +78,61 @@
             }
         });
     }
+
+    async function getKaryawan() {
+        $.ajax({
+            url: '<?= base_url('dashboard/karyawan/listUsers') ?>',
+            method: 'POST',
+            dataType: 'json',
+            data: {selectedKar: null },
+            success: function(response) {
+                $('#pickKaryawan').empty();
+                if (response) {
+                    $('#pickKaryawan').append($('<option>', {
+                        value: '',
+                        text: 'Pilih Karyawan'
+                    }));
+                    response.forEach(function(kar) {
+                        $('#pickKaryawan').append($('<option>', {
+                            value: kar.id,
+                            text: kar.namaKaryawan
+                        }));
+                    });
+                } else {
+                    $('#pickKaryawan').append($('<option>', {
+                        value: '',
+                        text: 'Tidak ada data'
+                    }));
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
+    }
     $(document).ready(function() {
         $("#pickRole").select2({
             placeholder: {
                 id: '',
-                text: 'Pilih Golongan'
+                text: 'Pilih Role'
+            },
+        });
+        $("#pickKaryawan").select2({
+            placeholder: {
+                id: '',
+                text: 'Pilih Karyawan'
             },
         });
         getRole();
+        $('#pickRole').on('change', function() {
+            var selectedRole = $(this).val();
+            if (selectedRole == 3) {
+                $('#karyawan-container').show();
+                getKaryawan();
+            } else {
+                $('#karyawan-container').hide();
+            }
+        });
     })
 </script>
 <?php $this->endSection();?>
