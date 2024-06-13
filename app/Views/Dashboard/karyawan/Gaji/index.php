@@ -69,7 +69,7 @@
         return 'Rp ' + value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
-
+    
     $(document).ready(function() {
         createMonthYearPicker('#month-date');
         

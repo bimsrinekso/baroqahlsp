@@ -45,6 +45,12 @@
             .select2{
                 width: 100% !important
             }
+            #sidebar .nav-link {
+                color: black; 
+            }
+            #sidebar .nav-link.active {
+                color: blue; 
+            }
         </style>
         <?php $this->renderSection('css');?>
 
@@ -61,6 +67,8 @@
                 </div>
             </div>
         <?php include 'footer.php'?> 
+
+
         <script src="/assets/js/plugins/jquery/jquery.min.js"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -75,6 +83,21 @@
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script src="/assets/js/plugins/toastr/toastr.min.js"></script>
         <script src="/assets/js/plugins/toastr/toastr.init.js"></script>
+        <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+                var currentPath = window.location.pathname;
+                var links = document.querySelectorAll('#sidebar .nav-link');
+
+                links.forEach(function(link) {
+                    var linkPath = new URL(link.href).pathname;
+                    if (currentPath === linkPath) {
+                        link.classList.add('active');
+                        link.closest('.nav-item').classList.add('active');
+                    }
+                });
+            });
+        </script>
         <?php if(session()->getFlashdata('sukses')):?>
         <script>
               toastr.success("<?= session()->getFlashData("sukses"); ?>");

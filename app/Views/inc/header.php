@@ -11,8 +11,7 @@
                     <img src="/assets/images/bimo2.jpg" alt="mdo" width="32" height="32" class="rounded-circle">
                 </a>
                 <ul class="dropdown-menu text-small shadow">
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="/logout">Sign out</a></li>
+                    <li><a class="dropdown-item" href="<?=base_url('/logout')?>">Sign out</a></li>
                 </ul>
             </div>
         </div>

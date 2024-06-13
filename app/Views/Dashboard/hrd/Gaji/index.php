@@ -17,12 +17,12 @@
             <div class="col-lg-4 mb-3">
                 <label for="pickKaryawan" class="form-label">Karyawan</label>
                 <select id="pickKaryawan" name="karyawanID" class="form-select" required>
-                    <!-- Options will be populated here -->
+                   
                 </select>
             </div>
-            <div class="col-lg-12 mb-3">
+            <div class="col-lg-12 mb-3 d-flex justify-content-between">
                 <button id="filter-button" class="btn btn-primary">Filter</button>
-                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#bayarModal">Hitung Gaji</button>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#bayarModal">Hitung Gaji</button>
             </div>
         </div>
         <table id="table-gaji" class="table table-striped" style="width:100%">
@@ -38,7 +38,7 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Data will be populated here -->
+                
             </tbody>
         </table>
     </div>
