@@ -34,11 +34,7 @@ $routes->group('dashboard', static function ($routes){
     $routes->group('gaji', static function ($routes){
         $routes->get('', 'GajiController::index',['filter' => 'role:admin,HRD,karyawan']);
         $routes->post('list', 'GajiController::list',['filter' => 'role:admin,HRD,karyawan']);
-        // $routes->get('create', 'GajiController::create');
         $routes->post('create', 'GajiController::save');
-        // $routes->get('edit/(:any)', 'GajiController::edit/$1');
-        // $routes->post('edit/(:any)', 'GajiController::update/$1');
-        // $routes->delete('delete/(:any)', 'GajiController::delete/$1');
     });
 
     $routes->group('usermanage', static function ($routes){

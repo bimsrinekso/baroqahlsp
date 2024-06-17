@@ -7,7 +7,7 @@
     <div class="col-lg-6 mt-3">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title">Form Input Golongan</h5>
+                <h5 class="card-title">Form Input Karyawan</h5>
             </div>
             <div class="card-body">
                 <form action="" method="post">

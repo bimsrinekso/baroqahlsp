@@ -45,6 +45,11 @@
 <?php $this->endSection();?>
 <?php $this->section('javascript');?>
 <script>
+    function formatCurrency(value) {
+        if (!value) return 'Rp 0.000';
+        value = parseFloat(value).toFixed(3); 
+        return 'Rp ' + value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
     $(document).ready(function() {
 
 
@@ -56,7 +61,16 @@
             columns: [
                 { data: 'namaGolongan', className: 'text-center' },
                 { data: 'bonus' , className: 'text-center'},
-                { data: 'gajiPokok' , className: 'text-center'},
+                { data: 'gajiPokok', 
+                    className: 'text-center',
+                    render: function(data, type, row) {
+                        if(data == null) {
+                            return '-';
+                        } else {
+                            return formatCurrency(data);
+                        }
+                    }
+                },
                 {
                     data: 'id',
                     className: 'text-center',
@@ -98,7 +112,6 @@
                     url: '<?= base_url('dashboard/golongan/delete/') ?>' + id,
                     success: function (response) {
                         toastr.success("Berhasil menghapus data");
-                        // Optionally, remove the modal after successful deletion
                         modal.modal('hide');
                         var table = $('#table-golongan').DataTable();
                         table.ajax.reload();

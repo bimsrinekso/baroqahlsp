@@ -113,6 +113,11 @@ class KaryawanController extends BaseController
 
     public function delete($id)
     {
+        $dataKaryawan = $this->karyawan->where('id', $id)->first();
+        $dataUser = $this->users->where('id', $dataKaryawan->userID)->first();
+        if (!empty($dataUser)) {
+            $this->users->delete($dataUser->id);
+        }
         $this->karyawan->delete($id);
         $this->sesi->setFlashdata('sukses', 'Data berhasil dihapus');
         return redirect()->to('dashboard/karyawan'); 

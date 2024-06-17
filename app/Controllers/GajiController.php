@@ -31,6 +31,7 @@ class GajiController extends BaseController
             karyawan.NIP,
             karyawan.tanggalMasuk,
             golongan.gajiPokok,
+            golongan.namaGolongan,
             karyawan.golongan,
             gaji.bulanGaji,
             gaji.totalGaji,
@@ -62,12 +63,12 @@ class GajiController extends BaseController
 
     public function save() {
         $isValid = [
-            'karyawanId' => 'required',
-            'bulanGaji' => 'required',
+            'karyawanIDdd' => 'required',
+            'month' => 'required',
             'gajiPokok' => 'required',
             'totalBonus' => 'required',
             'totalPotongan' => 'required',
-            'totalgaji' => 'required'
+            'totalGaji' => 'required'
         ];
         
 
@@ -83,14 +84,19 @@ class GajiController extends BaseController
         if (!empty($cekDataDup)) {
             return $this->response->setJSON(['dataDup' => $cekDataDup,'success' => 400, 'message' => 'Duplicate entry']);
         }
+
+        $gajiPokok = filter_var($this->request->getVar('gajiPokok'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        $totalBonus = filter_var($this->request->getVar('totalBonus'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        $totalPotongan = filter_var($this->request->getVar('totalPotongan'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        $totalGaji = filter_var($this->request->getVar('totalGaji'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
     
         $data = [
             "karyawanId" => $idKar,
             "bulanGaji" => $month,
-            "gajiPokok" => $this->request->getVar('gajiPokok'),
-            "totalBonus" => $this->request->getVar('totalBonus'),
-            "totalPotongan" => $this->request->getVar('totalPotongan'),
-            "totalGaji" => $this->request->getVar('totalGaji')
+            "gajiPokok" => $gajiPokok,
+            "totalBonus" =>  $totalBonus,
+            "totalPotongan" => $totalPotongan,
+            "totalGaji" => $totalGaji
         ];
     
         try {

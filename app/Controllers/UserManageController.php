@@ -110,21 +110,16 @@ class UserManageController extends BaseController
         try {
             $previousRole = $this->users->where('id',$id)->first();
             $previousKaryawan = $this->karyawan->where('userID', $id)->first();
-    
-            // If role is 3 and karyawan is different from the previous one
             if ($role == 3) {
                 $newKaryawanId = $this->request->getVar('karyawan');
     
                 if ($previousKaryawan && $previousKaryawan->id != $newKaryawanId) {
-                    // Set the previous karyawan userID to null
                     $this->karyawan->update($previousKaryawan->id, ['userID' => null]);
                 }
     
-                // Update the new karyawan userID
                 $this->karyawan->update($newKaryawanId, ['userID' => $id]);
             } 
     
-            // If role changes from 3 to 1 or 2, set the previous karyawan userID to null
             if ($previousRole->role_id == 3 && $role != 3) {
                 if ($previousKaryawan) {
                     $this->karyawan->update($previousKaryawan->id, ['userID' => null]);

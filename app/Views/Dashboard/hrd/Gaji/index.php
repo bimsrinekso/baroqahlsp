@@ -1,6 +1,5 @@
 <?php $this->extend('inc/main'); ?>
 <?php $this->section('css'); ?>
-<!-- Include necessary CSS here -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
 <?php $this->endSection(); ?>
 
@@ -29,11 +28,12 @@
             <thead>
                 <tr>
                     <th class="text-center">Nama Karyawan</th>
+                    <th class="text-center">Golongan</th>
                     <th class="text-center">Nip</th>
                     <th class="text-center">Bulan</th>
                     <th class="text-center">Gaji Pokok</th>
                     <th class="text-center">Bonus</th>
-                    <th class="text-center">Potongan</th>
+                    <th class="text-center">Pajak</th>
                     <th class="text-center">Total Gaji</th>
                 </tr>
             </thead>
@@ -59,11 +59,11 @@
                         <div class="col-lg-12 mb-3">
                             <label for="pickKaryawanDD" class="form-label">Karyawan</label>
                             <select id="pickKaryawanDD" name="karyawanIDdd" class="form-select" required>
-                                <!-- Options will be populated here -->
+                                
                             </select>
                         </div>
                         <div id="salaryDetails" class="row">
-                            <!-- Salary details will be populated here -->
+                            
                         </div>
                     </div>
                 <div class="modal-footer">
@@ -127,7 +127,8 @@
                             value: kar.id,
                             text: kar.namaKaryawan,
                             'data-gaji': kar.gajiPokok,
-                            'data-bonus': kar.bonus
+                            'data-bonus': kar.bonus,
+                            'data-golongan': kar.namaGolongan
                         }));
                     });
                 } else {
@@ -165,7 +166,7 @@
     }
     function formatCurrency(value) {
         if (!value) return 'Rp 0.000';
-        value = parseFloat(value).toFixed(3); // Ensure value has three decimal places
+        value = parseFloat(value).toFixed(3); 
         return 'Rp ' + value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
@@ -181,21 +182,17 @@
         getKaryawanDropdown();
         createMonthYearPicker('#month-date');
         
-        // Initialize date range picker without setting initial value
         $('#date-range').daterangepicker({
-            autoUpdateInput: false, // Disable automatic input update
+            autoUpdateInput: false,
             locale: {
                 cancelLabel: 'Clear',
                 format: 'YYYY-MM'
             }
         });
 
-        // Event listener for applying the date range
         $('#date-range').on('apply.daterangepicker', function(ev, picker) {
             $(this).val(picker.startDate.format('YYYY-MM') + ' - ' + picker.endDate.format('YYYY-MM'));
         });
-
-        // Event listener for clearing the date range
         $('#date-range').on('cancel.daterangepicker', function(ev, picker) {
             $(this).val('');
         });
@@ -223,6 +220,7 @@
             },
             columns: [
                 { data: 'namaKaryawan', className: 'text-center' },
+                { data: 'namaGolongan', className: 'text-center' },
                 { data: 'NIP', className: 'text-center' },
                 { data: 'bulanGaji', 
                     className: 'text-center',
@@ -296,22 +294,27 @@
             totalPotongan = parseFloat(totalPotongan)
             var totalGaji = gajiPokok + bonus - totalPotongan;
             totalGaji = parseFloat(totalGaji)
+            var golongan = $(this).find(':selected').data('golongan');
             $('#salaryDetails').html(`
                 <div class="col-lg-12 mb-3">
+                    <label class="form-label">Nama Golongan</label>
+                    <input type="text" id="gologan" name="gologan" class="form-control" value="${golongan}" readonly>
+                </div>
+                <div class="col-lg-12 mb-3">
                     <label class="form-label">Gaji Pokok</label>
-                    <input type="text" id="gajiPokok" name="gajiPokok" class="form-control" value="${gajiPokok}" readonly>
+                    <input type="text" id="gajiPokok" name="gajiPokok" class="form-control" value="${formatCurrency(gajiPokok)}" readonly>
                 </div>
                 <div class="col-lg-12 mb-3">
                     <label class="form-label">Total Bonus</label>
-                    <input type="text" id="totalBonus" name="totalBonus" class="form-control" value="${bonus}" readonly>
+                    <input type="text" id="totalBonus" name="totalBonus" class="form-control" value="${formatCurrency(bonus)}" readonly>
                 </div>
                 <div class="col-lg-12 mb-3">
-                    <label class="form-label">Total Potongan</label>
-                    <input type="text" id="totalPotongan" name="totalPotongan" class="form-control" value="${totalPotongan}" readonly>
+                    <label class="form-label">Pajak</label>
+                    <input type="text" id="totalPotongan" name="totalPotongan" class="form-control" value="${formatCurrency(totalPotongan)}" readonly>
                 </div>
                 <div class="col-lg-12 mb-3">
                     <label class="form-label">Total Gaji</label>
-                    <input type="text" id="totalGaji" name="totalGaji" class="form-control" value="${totalGaji}" readonly>
+                    <input type="text" id="totalGaji" name="totalGaji" class="form-control" value="${formatCurrency(totalGaji)}" readonly>
                 </div>
             `);
         });
