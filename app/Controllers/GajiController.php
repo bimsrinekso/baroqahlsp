@@ -59,6 +59,32 @@ class GajiController extends BaseController
             return $this->response->setJSON(['error' => $e->getMessage()]);
         }
     }
+
+    public function totalPengeluaran()
+    {
+        $startDate = $this->request->getVar('startDate');
+        $endDate = $this->request->getVar('endDate');
+        $idKaryawan = $this->request->getVar('karyawanID');
+    
+        $query = $this->gaji->selectSum("totalGaji");
+            
+        if ($startDate != '' && $endDate != '') {
+            $query = $query
+            ->where('gaji.bulanGaji >=', $startDate)
+            ->where('gaji.bulanGaji <=', $endDate);
+        }
+
+        if ($idKaryawan != null) {
+            $query = $query->where('karyawanId', $idKaryawan);
+        }
+    
+        $data = $query->findAll();
+        try {
+            return $this->response->setJSON(['data' => $data]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON(['error' => $e->getMessage()]);
+        }
+    }
     
 
     public function save() {

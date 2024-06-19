@@ -24,6 +24,12 @@
                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#bayarModal">Hitung Gaji</button>
             </div>
         </div>
+        <div class="row">
+            <div class="col-lg-12 mb-3 d-flex">
+                <p>Total Pengeluaran : </p>
+                <div id="totalPengeluaran"></div>
+            </div>
+        </div>
         <table id="table-gaji" class="table table-striped" style="width:100%">
             <thead>
                 <tr>
@@ -106,6 +112,30 @@
             },
             error: function(xhr, status, error) {
                 console.error(error);
+            }
+        });
+    }
+
+    async function getTotalPengeluaran(iniDate,karyawanID) {
+        
+        $.ajax({
+            url: '<?= base_url('dashboard/gaji/pengeluaran'); ?>', // Adjust this to your actual URL
+            method: "POST",
+            data: {
+                startDate: iniDate[0],
+                endDate: iniDate[1],
+                karyawanID: karyawanID
+            },
+            dataSrc: 'data',
+            success: function(response){
+                if (response.data) {
+                    $('#totalPengeluaran').html(formatCurrency(response.data[0].totalGaji));
+                } else {
+                    $('#totalPengeluaran').html('0');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr)
             }
         });
     }
@@ -196,6 +226,9 @@
         $('#date-range').on('cancel.daterangepicker', function(ev, picker) {
             $(this).val('');
         });
+        var dateRange = $('#date-range').val().split(' - ');
+        var karyawanID = $('#pickKaryawan').val();
+        getTotalPengeluaran(dateRange,karyawanID)
 
         var tablelist = $('#table-gaji').DataTable({
             scrollX: true,
@@ -203,7 +236,6 @@
                 url: '<?= base_url('dashboard/gaji/list'); ?>',
                 method: "POST",
                 data: function(d) {
-                    console.log(d)
                     var dateRange = $('#date-range').val().split(' - ');
                     d.startDate = dateRange[0];
                     d.endDate = dateRange[1];
@@ -275,13 +307,17 @@
             ],
             dom: 'Bfrtip',
             buttons: [
-                { extend: 'excelHtml5' },
-                { extend: 'pdfHtml5' },
-                { extend: 'print' }
+                { extend: 'excelHtml5', title:'Baroqah' },
+                { extend: 'pdfHtml5', title:'Baroqah'},
+                { extend: 'print', title:'Baroqah' }
             ],
         });
 
+
         $('#filter-button').click(function() {
+            var dateRange = $('#date-range').val().split(' - ');
+            var karyawanID = $('#pickKaryawan').val();
+            getTotalPengeluaran(dateRange,karyawanID)
             tablelist.ajax.reload();
         });
         $('#pickKaryawanDD').change(function() {
@@ -334,8 +370,6 @@
                 data: formData,
                 dataType: 'json',
                 success: function(response) {
-                    console.log(formData)
-                    console.log(response)
                     if (response.success == 200) {
                         toastr.success(response.message);
                         $('#bayarModal').modal('hide');
@@ -347,7 +381,6 @@
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.log(xhr)
                     alert('Gagal menyimpan data. Silakan coba lagi nanti.');
                 }
             });

@@ -34,7 +34,8 @@ $routes->group('dashboard', static function ($routes){
     $routes->group('gaji', static function ($routes){
         $routes->get('', 'GajiController::index',['filter' => 'role:admin,HRD,karyawan']);
         $routes->post('list', 'GajiController::list',['filter' => 'role:admin,HRD,karyawan']);
-        $routes->post('create', 'GajiController::save');
+        $routes->post('pengeluaran', 'GajiController::totalPengeluaran',['filter' => 'role:admin,HRD']);
+        $routes->post('create', 'GajiController::save',['filter' => 'role:admin,HRD']);
     });
 
     $routes->group('usermanage', static function ($routes){
